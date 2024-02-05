@@ -1,6 +1,9 @@
 //盤面の縦横の数（どちらも9）
 const BOARD_SIZE = 9;
 
+//HTMLの生成（必ずあらかじめ実行しておくこと）
+generateSudokuTableHTML();
+
 //盤面の定義
 let sudoku_board = new Array(BOARD_SIZE);
 //オブジェクトをfillの引数に与えないこと
@@ -28,6 +31,47 @@ for(let i = 0; i < BOARD_SIZE; i++){
     }
 }
 */
+
+//生成が完了したらHTMLに配置
+putsSudokuBoardinTable();
+
+//html上の数独のテーブルを生成
+function generateSudokuTableHTML(){
+    let sudoku_table_div = document.getElementById('sudoku_table_div');
+    let sudoku_table = document.createElement('table');
+    sudoku_table.id = "sudoku_table";
+    for(let i = 0; i < BOARD_SIZE; i++){
+        let tr = document.createElement('tr');
+        tr.className = "sudoku_table_row";
+        for(let j = 0; j < BOARD_SIZE; j++){
+            let td = document.createElement('td');
+            td.className = "sudoku_table_cell";
+            //3、6列目の場合テーブルの右を太くするためのクラス名を指定
+            if((j + 1) % 3 == 0 && Math.floor((j + 1) / BOARD_SIZE) < 1){
+                td.classList.add('cell_bold_right');
+            }
+            //3、6行目の場合は下を太くするクラス名
+            if((i + 1) % 3 == 0 && Math.floor((i + 1) / BOARD_SIZE) < 1){
+                td.classList.add('cell_bold_bottom');
+            }
+            tr.appendChild(td);
+        }
+        sudoku_table.appendChild(tr);
+    }
+
+    sudoku_table_div.appendChild(sudoku_table);
+}
+
+//生成した数独の配列をHTMLのテーブルに配置する
+function putsSudokuBoardinTable(){
+    let sudoku_table_rows = document.getElementsByClassName('sudoku_table_row');
+    for(let i = 0; i < BOARD_SIZE; i++){
+        let sudoku_table_cells = sudoku_table_rows[i].children;
+        for(let j = 0; j < BOARD_SIZE; j++){
+            sudoku_table_cells[j].innerText = sudoku_board[i][j];
+        }
+    }
+}
 
 //数字が盤面の添え字に該当するか調べる（0から8であるかどうか）
 function isBoardIndex(num_index){

@@ -1,0 +1,18 @@
+#sudoku_table{
+    margin: 0 auto;
+    border-collapse: collapse;
+    border: solid 3px;
+}
+.sudoku_table_cell{
+    border: solid 1px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    font-size: 20px;
+}
+.cell_bold_right{
+    border-right: solid 3px;
+}
+.cell_bold_bottom{
+    border-bottom: solid 3px;
+}
