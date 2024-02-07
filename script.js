@@ -5,32 +5,22 @@ const BOARD_SIZE = 9;
 generateSudokuTableHTML();
 
 //盤面の定義
-let sudoku_board = new Array(BOARD_SIZE);
+let sudoku_board_ans = new Array(BOARD_SIZE);
 //オブジェクトをfillの引数に与えないこと
 for(let i = 0; i < BOARD_SIZE; i++){
-    sudoku_board[i] = new Array(BOARD_SIZE).fill(0);
+    sudoku_board_ans[i] = new Array(BOARD_SIZE).fill(0);
 }
 
 //盤面のベースの生成
 //最上段横1列をランダム配列に基づいて埋めて確定する
 let array_rand = generateRandomArray1to9();
 for(let i = 0; i < BOARD_SIZE; i++){
-    sudoku_board[0][i] = array_rand[i];
+    sudoku_board_ans[0][i] = array_rand[i];
 }
 //2列目以降を再帰処理で生成
 generateSudokuNumRecursive(1, 0);
 
-/*
-for(let i = 0; i < BOARD_SIZE; i++){
-    for(let j = 0; j < BOARD_SIZE; j++){
-        //縦と横と3*3マス内の数値それぞれの合計が45になるような盤面を生成
-        let hor_index = Math.floor(i / 3) * 3 + j % 3;
-        let ver_index = (i % 3) * 3 + Math.floor(j / 3);
-
-        sudoku_board[hor_index][ver_index] = 0;
-    }
-}
-*/
+//穴をあける処理を実行する予定の箇所
 
 //生成が完了したらHTMLに配置
 putsSudokuBoardinTable();
@@ -68,7 +58,7 @@ function putsSudokuBoardinTable(){
     for(let i = 0; i < BOARD_SIZE; i++){
         let sudoku_table_cells = sudoku_table_rows[i].children;
         for(let j = 0; j < BOARD_SIZE; j++){
-            sudoku_table_cells[j].innerText = sudoku_board[i][j];
+            sudoku_table_cells[j].innerText = sudoku_board_ans[i][j];
         }
     }
 }
@@ -105,7 +95,7 @@ function generateRandomArray1to9(){
 }
 
 //指定した行に存在する数値の配列を生成
-function generateTargetHorNumArray(hor_index){
+function generateTargetHorNumArray(sudoku_board, hor_index){
     if(isBoardIndex(hor_index)){
         let array_hor = [];
         for(let i = 0; i < BOARD_SIZE; i++){
@@ -119,7 +109,7 @@ function generateTargetHorNumArray(hor_index){
 }
 
 //指定した列に存在する数値の配列を生成
-function generateTargetVerNumArray(ver_index){
+function generateTargetVerNumArray(sudoku_board, ver_index){
     if(isBoardIndex(ver_index)){
         let array_ver = [];
         for(let i = 0; i < BOARD_SIZE; i++){
@@ -133,7 +123,7 @@ function generateTargetVerNumArray(ver_index){
 }
 
 //指定した行列に該当するブロック内の数値の配列を生成
-function generateTargetBlockNumArray(hor_index, ver_index){
+function generateTargetBlockNumArray(sudoku_board, hor_index, ver_index){
     if(isBoardIndex(hor_index) && isBoardIndex(ver_index)){
         let array_box = [];
         for(let i = 0; i < BOARD_SIZE; i++){
@@ -156,9 +146,9 @@ function generateTargetCoordCandidate(hor_index, ver_index){
         //埋められる候補の数値の配列（初期値は1～9のランダム配列）
         let array_candidate = generateRandomArray1to9();
         //行、列、3×3の範囲を調べて配列として出す
-        let array_hor = generateTargetHorNumArray(hor_index);
-        let array_ver = generateTargetVerNumArray(ver_index);
-        let array_box = generateTargetBlockNumArray(hor_index, ver_index);
+        let array_hor = generateTargetHorNumArray(sudoku_board_ans, hor_index);
+        let array_ver = generateTargetVerNumArray(sudoku_board_ans, ver_index);
+        let array_box = generateTargetBlockNumArray(sudoku_board_ans, hor_index, ver_index);
         array_delete = array_delete.concat(array_hor, array_ver, array_box);
         //重複を削除する
         array_delete = Array.from(new Set(array_delete));
@@ -184,7 +174,7 @@ function generateSudokuNumRecursive(hor_index, ver_index){
     //候補が存在する場合
     for(let i = 0; i < array_candidate.length; i++){
         //候補となる数値を指定された座標に埋める
-        sudoku_board[hor_index][ver_index] = array_candidate[i];
+        sudoku_board_ans[hor_index][ver_index] = array_candidate[i];
         //次の座標に移動し再帰処理を行う
         //右下まで到達した場合、再帰処理を終了
         if(hor_index >= BOARD_SIZE - 1 && ver_index >= BOARD_SIZE - 1){
@@ -205,14 +195,14 @@ function generateSudokuNumRecursive(hor_index, ver_index){
         if(flg_found) return true;
 
         //埋めた数値をゼロに戻す
-        sudoku_board[hor_index][ver_index] = 0;
+        sudoku_board_ans[hor_index][ver_index] = 0;
     } 
 
     return false;
 }
 
 //指定した行の数値の合計を求める
-function calcTargetHorSum(hor_index){
+function calcTargetHorSum(sudoku_board, hor_index){
     //有効な行かどうか調べる
     if(isBoardIndex(hor_index)){
         let result_sum = 0;
@@ -229,7 +219,7 @@ function calcTargetHorSum(hor_index){
     }
 }
 //指定した列の数値の合計を求める
-function calcTargetVerSum(ver_index){
+function calcTargetVerSum(sudoku_board, ver_index){
     //有効な列かどうか調べる
     if(isBoardIndex(ver_index)){
         let result_sum = 0;
@@ -247,7 +237,7 @@ function calcTargetVerSum(ver_index){
 }
 
 //指定したブロック内の数値の合計を求める
-function calcTargetBlockSum(hor3_index, ver3_index){
+function calcTargetBlockSum(sudoku_board, hor3_index, ver3_index){
     //有効なブロックかどうか調べる
     if((hor3_index >= 0 && hor3_index <= 2) && (ver3_index >= 0 && ver3_index <= 2)){
         let result_sum = 0;
