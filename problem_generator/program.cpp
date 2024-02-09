@@ -195,11 +195,18 @@ int main(){
     generateSudokuNumRecursive(sudoku_board_ans, 1, 0);
 
     //盤面の表示
+
     for(int i = 0; i < BOARD_SIZE; i++){
+        string str;
+        for(int k = 0; k < BOARD_SIZE + 4; k++) str += "* ";
+        if(i % 3 == 0) cout << str << endl;
         for(int j = 0; j < BOARD_SIZE; j++){
+            if(j % 3 == 0) cout << "* ";
             cout << sudoku_board_ans[i][j] << " ";
+            if(j == BOARD_SIZE - 1) cout << "*";
         }
         cout << endl;
+        if(i == BOARD_SIZE - 1) cout << str << endl;
     }
 
     return 0;
