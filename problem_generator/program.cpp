@@ -154,6 +154,43 @@ bool generateSudokuNumRecursive(vector<vector<int>>& sudoku_board, int hor_index
     return false;
 }
 
+//盤面に穴をあけていく処理
+bool generateHoleOnBoardRecursive(vector<vector<int>>& sudoku_board, int empty_num){
+    //穴をあける箇所の候補
+    vector<int> array_candidate;
+    //盤面から候補を生成
+    for(int i = 0; i < BOARD_SIZE; i++){
+        for(int j = 0; j < BOARD_SIZE; j++){
+            //0は空白なのでそれ以外であれば候補として数値に変換して追加
+            if(sudoku_board[i][j] != 0) array_candidate.push_back(i * BOARD_SIZE + j);
+        }
+    }
+    //候補をランダムにシャッフルする
+    array_candidate = shuffleArrayRandom(array_candidate);
+    //穴を開け終わったかどうかのフラグ
+    bool flg_success = false;
+    //候補が存在する場合for文を実行
+    for(int i = 0; i < array_candidate.size(); i++){
+        //目標の数まで穴をあけ終えたら再帰処理を終了
+        if(empty_num <= 0) return true;
+        int hor_index = array_candidate[i] / BOARD_SIZE;
+        int ver_index = array_candidate[i] % BOARD_SIZE;
+        //穴を開ける処理（開ける前の数値は記憶しておく）
+        int temp = sudoku_board[hor_index][ver_index];
+        sudoku_board[hor_index][ver_index] = 0;
+        //解が一つであると同時に解くことができる問題かどうか調べる
+
+        //目標の数まで穴をあける再帰処理を実行
+        flg_success = generateHoleOnBoardRecursive(sudoku_board, empty_num - 1);
+        //穴を開け終わっていたら終了
+        if(flg_success) return true;
+        //開けた数値を元の数値に戻す
+        sudoku_board[hor_index][ver_index] = temp;
+    }
+
+    return false;
+}
+
 //ランダム配列のランダム性テスト
 void testRandomArrayNumCount(int try_num, int target_num){
     //少なくとも試行回数は一回以上
@@ -183,7 +220,7 @@ void testRandomArrayNumCount(int try_num, int target_num){
 int main(){
     //疑似乱数ののシード値を設定
     srand((unsigned int)time(NULL));
-    //盤面の定義
+    //解答用の盤面の定義
     vector<vector<int>> sudoku_board_ans;
     sudoku_board_ans.assign(BOARD_SIZE, vector<int>(BOARD_SIZE, 0));
     //盤面のベースの生成
@@ -192,17 +229,21 @@ int main(){
     for(int i = 0; i < BOARD_SIZE; i++){
         sudoku_board_ans[0][i] = array_rand[i];
     }
+    //2列目以降の盤面を生成
     generateSudokuNumRecursive(sudoku_board_ans, 1, 0);
+    //問題用の盤面の定義
+    vector<vector<int>> sudoku_board_prob = sudoku_board_ans;
+    //穴をあける処理
+    generateHoleOnBoardRecursive(sudoku_board_prob, 20);
 
     //盤面の表示
-
     for(int i = 0; i < BOARD_SIZE; i++){
         string str;
         for(int k = 0; k < BOARD_SIZE + 4; k++) str += "* ";
         if(i % 3 == 0) cout << str << endl;
         for(int j = 0; j < BOARD_SIZE; j++){
             if(j % 3 == 0) cout << "* ";
-            cout << sudoku_board_ans[i][j] << " ";
+            cout << sudoku_board_prob[i][j] << " ";
             if(j == BOARD_SIZE - 1) cout << "*";
         }
         cout << endl;
