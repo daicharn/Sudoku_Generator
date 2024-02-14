@@ -4,7 +4,9 @@
 #include <math.h>
 #include <time.h>
 #include <algorithm>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 using namespace std;
 //盤面の縦横の数（どちらも9）
 const int BOARD_SIZE = 9;
@@ -280,6 +282,17 @@ void outputSudokuBoard(vector<vector<int>> sudoku_board){
     }
 }
 
+//ディレクトリを作成する関数
+bool createDirectory(const string& folderPath){
+    //フォルダが存在しなければ作成する
+    if(!fs::exists(folderPath)){
+        fs::create_directory(folderPath);
+        return true;
+    }
+
+    return false;
+}
+
 //ランダム配列のランダム性テスト
 void testRandomArrayNumCount(int try_num, int target_num){
     //少なくとも試行回数は一回以上
@@ -317,6 +330,11 @@ int main(){
     vector<vector<int>> sudoku_board_prob = generateSudokuBoardProb(sudoku_board_ans);
     //clock_t end = clock();
 
+    //ファイル保存用のフォルダ作成
+    const string folderName = "problems";
+    const string folderPath = fs::current_path().string() + "\\" + folderName;
+    createDirectory(folderPath);
+    
     //解答を出力
     outputSudokuBoard(sudoku_board_ans);
     //問題を出力
