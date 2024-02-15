@@ -5,6 +5,7 @@
 #include <time.h>
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
 
 namespace fs = std::filesystem;
 using namespace std;
@@ -293,6 +294,71 @@ bool createDirectory(const string& folderPath){
     return false;
 }
 
+//ファイル名と対象のフォルダパスを指定して適切な連番付きのファイル名を生成
+string getNextFileName(const string& baseName, const string& folderPath, const string& extension, const int num_width){
+    //フォルダが存在するかどうか確認
+    if(fs::exists(folderPath)){
+        //連番の先頭
+        int i = 1;
+        //ファイル名
+        string fileName;
+        //ファイルパス
+        fs::path path;
+        //ファイルが見つからなくなるまで繰り返す
+        do{
+            //num_widthで指定された桁数およびextentionの拡張子を基に連番を生成
+            stringstream ss;
+            ss << setw(num_width) << setfill('0') << i << "." << extension;
+            //連番をもとにファイル名を生成
+            fileName = baseName + ss.str();
+            //フォルダパス、完成したファイル名を基にパスを生成
+            path.append(folderPath);
+            path.append(fileName);
+            //連番のインクリメント
+            i++;
+        } while(fs::exists(path));
+
+        return fileName;
+    }
+    else{
+        //空文字を返す
+        return "";
+    }
+}
+
+//生成した数独の解答と問題をファイルとして出力
+bool outputSudokuBoardFile(vector<vector<int>>& sudoku_board_ans, vector<vector<int>>& sudoku_board_prob, const string& filePath){
+    ofstream outputFile(filePath);
+    if(outputFile.is_open()){
+        //数独の解答を出力
+        for(int i = 0; i < BOARD_SIZE; i++){
+            string outputStr;
+            for(int j = 0; j < BOARD_SIZE; j++){
+                outputStr += to_string(sudoku_board_ans[i][j]);
+            }
+            outputFile << outputStr << endl;
+        }
+        //数独の問題を出力
+        for(int i = 0; i < BOARD_SIZE; i++){
+            string outputStr;
+            for(int j = 0; j < BOARD_SIZE; j++){
+                outputStr += to_string(sudoku_board_prob[i][j]);
+            }
+            outputFile << outputStr;
+            //最後だけは改行しない
+            if(i != BOARD_SIZE - 1) outputFile << endl;
+        }
+        //ファイルをクローズ
+        outputFile.close();
+
+        return true;
+    }
+    else{
+        return false;
+    }
+
+}
+
 //ランダム配列のランダム性テスト
 void testRandomArrayNumCount(int try_num, int target_num){
     //少なくとも試行回数は一回以上
@@ -341,6 +407,13 @@ int main(){
     outputSudokuBoard(sudoku_board_prob);
     //処理速度の計測表示
     //cout << double(end - start) << endl;
+
+    //ファイル名の生成
+    const string fileName = getNextFileName("sudoku", folderPath, "txt", 5);
+    //ファイルパス
+    const string filePath = folderPath + "\\" + fileName;
+    //問題と解答をファイルに保存
+    outputSudokuBoardFile(sudoku_board_ans, sudoku_board_prob, filePath);
     
     return 0;
 }
