@@ -359,6 +359,28 @@ bool outputSudokuBoardFile(vector<vector<int>>& sudoku_board_ans, vector<vector<
 
 }
 
+//一連の数独生成、保存処理
+void generateAndOutputSudoku(){
+    //解答用の盤面の定義
+    vector<vector<int>> sudoku_board_ans = generateSudokuBoardAns();
+    //問題用の盤面の定義
+    vector<vector<int>> sudoku_board_prob = generateSudokuBoardProb(sudoku_board_ans);
+    //ファイル保存用のフォルダ作成
+    const string folderName = "problems";
+    const string folderPath = fs::current_path().string() + "\\" + folderName;
+    createDirectory(folderPath);
+    //ファイル名の生成
+    const string fileName = getNextFileName("sudoku", folderPath, "txt", 5);
+    //ファイルパス
+    const string filePath = folderPath + "\\" + fileName;
+    //問題と解答をファイルに保存
+    outputSudokuBoardFile(sudoku_board_ans, sudoku_board_prob, filePath);
+    //解答を出力
+    //outputSudokuBoard(sudoku_board_ans);
+    //問題を出力
+    //outputSudokuBoard(sudoku_board_prob);
+}
+
 //ランダム配列のランダム性テスト
 void testRandomArrayNumCount(int try_num, int target_num){
     //少なくとも試行回数は一回以上
@@ -389,31 +411,15 @@ int main(){
     //疑似乱数ののシード値を設定
     srand((unsigned int)time(NULL));
 
-    //clock_t start = clock();
-    //解答用の盤面の定義
-    vector<vector<int>> sudoku_board_ans = generateSudokuBoardAns();
-    //問題用の盤面の定義
-    vector<vector<int>> sudoku_board_prob = generateSudokuBoardProb(sudoku_board_ans);
-    //clock_t end = clock();
-
-    //ファイル保存用のフォルダ作成
-    const string folderName = "problems";
-    const string folderPath = fs::current_path().string() + "\\" + folderName;
-    createDirectory(folderPath);
-    
-    //解答を出力
-    outputSudokuBoard(sudoku_board_ans);
-    //問題を出力
-    outputSudokuBoard(sudoku_board_prob);
+    clock_t start = clock();
+    //複数回生成
+    for(int i = 0; i < 1; i++){
+        //数独の生成、保存
+        generateAndOutputSudoku();
+    }
+    clock_t end = clock();
     //処理速度の計測表示
-    //cout << double(end - start) << endl;
-
-    //ファイル名の生成
-    const string fileName = getNextFileName("sudoku", folderPath, "txt", 5);
-    //ファイルパス
-    const string filePath = folderPath + "\\" + fileName;
-    //問題と解答をファイルに保存
-    outputSudokuBoardFile(sudoku_board_ans, sudoku_board_prob, filePath);
+    cout << double(end - start) << "ms" << endl;
     
     return 0;
 }
