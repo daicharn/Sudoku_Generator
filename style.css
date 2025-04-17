@@ -16,3 +16,7 @@
 .cell_bold_bottom{
     border-bottom: solid 3px;
 }
+
+#sudoku_table, .sudoku_table_cell, .cell_bold_right, .cell_bold_bottom{
+    border-color:rgb(26, 182, 255);
+}
