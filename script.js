@@ -41,8 +41,11 @@ async function getData(){
             let sudoku_table_cells = sudoku_table_rows[i].children;
             for(let j = 0; j < 9; j++){
                 sudoku_table_cells[j].innerText = json[i][j];
+                //0（穴の箇所）は非表示にする
+                if(JSON.parse(json[i][j] == 0)) sudoku_table_cells[j].style.visibility = 'hidden';
             }
         }
+
     } catch (error){
         console.log(error);
     }

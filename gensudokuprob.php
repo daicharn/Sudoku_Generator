@@ -176,5 +176,96 @@ function generateSudokuBoardAns(){
     return $sudoku_board_ans;
 }
 
-header("Content-Type: text/javascript; charset=utf-8");
-echo json_encode(generateSudokuBoardAns());
+//数独の盤面が解け、かつ解が一意になっているかどうか調べる
+function hasSudokuBoardUniqueSolution($sudoku_board){
+    //解けるか解けなくなるまで繰り返し候補を埋めていく
+    while(true){
+        //穴がある箇所の配列
+        $array_hole = [];
+        //解くことができないことを示すフラグ
+        $flg_impossible = true;
+        //盤面から穴の箇所を生成
+        for($i = 0; $i < BOARD_SIZE; $i++){
+            for($j = 0; $j < BOARD_SIZE; $j++){
+                //0であれば穴として数値に変換して追加
+                if($sudoku_board[$i][$j] == 0) array_push($array_hole, $i * BOARD_SIZE + $j);
+            }
+        }
+        //穴を順に調べていく
+        for($i = 0; $i < count($array_hole); $i++){
+            $hor_index = intdiv($array_hole[$i], BOARD_SIZE);
+            $ver_index = $array_hole[$i] % BOARD_SIZE;
+            //穴に埋められる候補を計算
+            $array_candidate = generateTargetCoordCandidate($sudoku_board, $hor_index, $ver_index);
+            //候補が1個であればまだ解けるとみなし、穴を埋める
+            if(count($array_candidate) == 1){
+                $flg_impossible = false;
+                $sudoku_board[$hor_index][$ver_index] = $array_candidate[0];
+            }
+        }
+
+        //解けていればtrueを返す
+        if(count($array_hole) == 0) return true;
+        //解けなければfalseを返す
+        if($flg_impossible) return false;
+    }
+}
+
+//盤面に穴をあけていく処理
+function generateHoleOnBoardRecursive(&$sudoku_board, int $empty_num){
+    //穴をあける箇所の候補
+    $array_candidate = [];
+    //盤面から候補を生成
+    for($i = 0; $i < BOARD_SIZE; $i++){
+        for($j = 0; $j < BOARD_SIZE; $j++){
+             //0は空白なのでそれ以外であれば候補として数値に変換して追加
+             if($sudoku_board[$i][$j] != 0) array_push($array_candidate, $i * BOARD_SIZE + $j);
+        }
+    }
+    //候補をランダムにシャッフルする
+    $array_candidate = shuffleArrayRandom($array_candidate);
+    //穴を開け終わったかどうかのフラグ
+    $flg_success = false;
+    //候補が存在する場合for文を実行
+    for($i = 0; $i < count($array_candidate); $i++){
+        //目標の数まで穴をあけ終えたら再帰処理を終了
+        if($empty_num <= 0) return true;
+        $hor_index = intdiv($array_candidate[$i], BOARD_SIZE);
+        $ver_index = $array_candidate[$i] % BOARD_SIZE;
+        //穴を開ける処理（開ける前の数値は記憶しておく）
+        $temp = $sudoku_board[$hor_index][$ver_index];
+        $sudoku_board[$hor_index][$ver_index] = 0;
+        //解が一つであると同時に解くことができる問題かどうか調べる
+        if(hasSudokuBoardUniqueSolution($sudoku_board)){
+            //目標の数まで穴をあける再帰処理を実行
+            $flg_success = generateHoleOnBoardRecursive($sudoku_board, $empty_num - 1);
+        }
+        //穴を開け終わっていたら終了
+        if($flg_success) return true;
+        //開けた数値を元の数値に戻す
+        $sudoku_board[$hor_index][$ver_index] = $temp;
+    }
+
+    return false;
+}
+
+//数独の盤面（問題）を生成する関数
+function generateSudokuBoardProb($sudoku_board_ans, int $empty_num){
+    //穴をあける処理
+    generateHoleOnBoardRecursive($sudoku_board_ans, $empty_num);
+
+    return $sudoku_board_ans;
+}
+
+//一連の数独生成、保存処理
+function generateSudoku(int $empty_num){
+    //解答用の盤面の定義
+    $sudoku_board_ans = generateSudokuBoardAns();
+    //問題用の盤面の定義
+    $sudoku_board_prob = generateSudokuBoardProb($sudoku_board_ans, $empty_num);
+    //Javascript側にデータを送信
+    header("Content-Type: text/javascript; charset=utf-8");
+    echo json_encode($sudoku_board_prob);
+}
+
+generateSudoku(50);
