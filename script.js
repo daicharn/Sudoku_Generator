@@ -1,3 +1,38 @@
+//穴の数が範囲外の時に警告を出すイベント
+document.getElementById('hole_num').addEventListener('blur', () => {
+    let num = Number(document.getElementById('hole_num').value);
+    if(num < 0 || num > 50) {
+        alert("0から50の範囲で入力してください");
+        document.getElementById('hole_num').value = "0";
+    }
+});
+
+//生成するボタンを推したとき
+document.getElementById('btn_gen').addEventListener('click', () => {
+    let radio_gen_method = document.getElementsByName('gen_method');
+    let hole_num = 0;
+    //難易度で指定が選択されている場合
+    if(radio_gen_method[0].checked){
+        let radio_difficulty = document.getElementsByName('difficulty');
+        if(radio_difficulty[0].checked) hole_num = Math.floor(Math.random() * 11) + 10;
+        else if (radio_difficulty[1].checked) hole_num = Math.floor(Math.random() * 11) + 20;
+        else if (radio_difficulty[2].checked) hole_num = Math.floor(Math.random() * 21) + 30;
+    }
+    //穴の数で指定が選択されている場合
+    else if(radio_gen_method[1].checked){
+        hole_num = Number(document.getElementById('hole_num').value);
+    }
+
+    getData(hole_num);
+    switchView();
+});
+
+//生成ダイアログを閉じて数独の盤面を表示する
+function switchView(){
+    document.getElementById('modal_generate').style.display = "none";
+    document.getElementById('sudoku_table_div').style.display = "block";
+}
+
 //html上の数独のテーブルを生成
 function generateSudokuTableHTML(){
     let sudoku_table_div = document.getElementById('sudoku_table_div');
@@ -26,10 +61,15 @@ function generateSudokuTableHTML(){
 }
 
 //PHPから数独のデータを取得する
-async function getData(){
+async function getData(hole_num){
     const url = 'gensudokuprob.php';
     try{
-        const response = await fetch(url);
+        const postData = new FormData();
+        postData.set('hole_num', hole_num);
+        const response = await fetch(url, {
+            method: "POST",
+            body: postData
+        });
         if(!response.ok){
             throw new Error('レスポンスステータス: ${response.status}');
         }
@@ -52,5 +92,3 @@ async function getData(){
 }
 
 generateSudokuTableHTML();
-
-getData();

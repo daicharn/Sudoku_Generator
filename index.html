@@ -7,6 +7,34 @@
  </head>
  <body>
   <div id="sudoku_table_div"></div>
+  <div id="modal_generate" class="modal">
+    <div class="modal_content">
+     <div class="modal_header">
+      <h1>数独の生成</h1>
+     </div>
+     <div id="modal_generate_body" class="modal_body">
+      <div class="radio_div">
+        <input type="radio" id="radio_difficulty" name="gen_method" value="0" checked>
+        <label for="radio_difficulty" class="radio_diff_label">難易度で指定</label>
+        <input type="radio" id="radio_easy" name="difficulty" value="0" checked>
+        <label for="radio_easy" class="radio_diffselect_label">簡単</label>
+        <input type="radio" id="radio_normal" name="difficulty" value="1">
+        <label for="radio_normal" class="radio_diffselect_label">普通</label>
+        <input type="radio" id="radio_hard" name="difficulty" value="2">
+        <label for="radio_hard" class="radio_diffselect_label">難しい</label>
+      </div>
+      <div class="radio_div">
+        <input type="radio" id="radio_hole" name="gen_method" value="1">
+        <label for="radio_hole" class="radio_diff_label">穴の数で指定</label>
+        <input type="number" id="hole_num" value="10" min="0" max="50">
+        <span>（0から50で入力）</span>
+      </div>
+      <div id="btn_gen_div">
+        <button id="btn_gen">生成する</button>
+      </div>
+     </div>
+    </div>
+   </div>
  </body>
  <script src="script.js"></script>
 </html>

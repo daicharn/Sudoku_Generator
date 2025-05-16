@@ -268,4 +268,4 @@ function generateSudoku(int $empty_num){
     echo json_encode($sudoku_board_prob);
 }
 
-generateSudoku(50);
+generateSudoku($_POST['hole_num']);
