@@ -80,9 +80,17 @@ async function getData(hole_num){
         for(let i = 0; i < 9; i++){
             let sudoku_table_cells = sudoku_table_rows[i].children;
             for(let j = 0; j < 9; j++){
-                sudoku_table_cells[j].innerText = json[i][j];
+                let sudoku_table_cell = sudoku_table_cells[j];
+                if(json[i][j] != 0) sudoku_table_cell.innerText = json[i][j];
+                else sudoku_table_cell.innerText = '';
                 //0（穴の箇所）は非表示にする
-                if(JSON.parse(json[i][j] == 0)) sudoku_table_cells[j].style.visibility = 'hidden';
+                if(JSON.parse(json[i][j] == 0)){
+                    sudoku_table_cell.style.opacity = '0';
+                }
+                //数字がある箇所は太字にする
+                else{
+                    sudoku_table_cell.style.fontWeight = 'bold';
+                }
             }
         }
 
@@ -92,3 +100,52 @@ async function getData(hole_num){
 }
 
 generateSudokuTableHTML();
+
+//空いたマスをクリックした時のイベント
+let sudoku_table_cells = Array.from(document.getElementsByClassName('sudoku_table_cell'));
+const sudoku_matrix = [];
+while(sudoku_table_cells.length) sudoku_matrix.push(sudoku_table_cells.splice(0, 9));
+
+for(let i = 0; i < sudoku_matrix.length; i++){
+    for(let j = 0; j < sudoku_matrix[i].length; j++){
+        let sudoku_table_cell = sudoku_matrix[i][j];
+        sudoku_table_cell.addEventListener('click', () => {
+            deleteTargetCellStyleAll();
+
+            //選択した数値と同じ数値を探索する
+            if(sudoku_table_cell.innerText != ''){
+                //縦、横、3*3の範囲を選択状態にする
+                for(let k = 0; k < 9; k++){
+                    let target_cell_hor = sudoku_matrix[i][k];
+                    let target_cell_var = sudoku_matrix[k][j];
+                    let target_cell_box = sudoku_matrix[Math.floor(i % 9 / 3) * 3 + Math.floor(k / 3)][Math.floor(j % 9 / 3) * 3 + k % 3];
+                    target_cell_hor.style.backgroundColor = 'rgb(200, 229, 248)';
+                    target_cell_hor.style.opacity = '1';
+                    target_cell_var.style.backgroundColor = 'rgb(200, 229, 248)';
+                    target_cell_var.style.opacity = '1';
+                    target_cell_box.style.backgroundColor = 'rgb(200, 229, 248)';
+                    target_cell_box.style.opacity = '1';
+                }
+                //同じ数値の箇所を選択状態にする
+                
+            }
+
+            sudoku_table_cell.style.opacity = '1';
+            sudoku_table_cell.style.backgroundColor = 'rgb(107, 188, 241)';
+        });
+    }
+};
+
+//指定したセルの選択状態を削除する
+function deleteTargetCellStyle(cell){
+    if(cell.innerText == '') cell.style.opacity = '0';
+    cell.style.backgroundColor = 'white';
+}
+//全てのセルの選択状態を削除する
+function deleteTargetCellStyleAll(){
+    const sudoku_table_cells = document.getElementsByClassName('sudoku_table_cell');
+    for(let i = 0; i < sudoku_table_cells.length; i++){
+        let sudoku_table_cell = sudoku_table_cells[i];
+        deleteTargetCellStyle(sudoku_table_cell);
+    }
+}
