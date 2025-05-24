@@ -1,5 +1,6 @@
-#sudoku_table_div{
+#sudoku_div{
     display: none;
+    justify-content: center;
 }
 #sudoku_table{
     margin: 0 auto;
@@ -24,6 +25,22 @@
 
 #sudoku_table, .sudoku_table_cell, .cell_bold_right, .cell_bold_bottom{
     border-color:rgb(26, 182, 255);
+}
+
+#btn_num_div{
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 20px;
+    width: 210px;
+    height: 210px;
+}
+.btn_num{
+    width: 60px;
+    height: 60px;
+    font-size: 25px;
+    background-color: rgb(117, 204, 238);
+    border-color: rgb(65, 172, 221);
+    margin: 5px;
 }
 
 .modal{

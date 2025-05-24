@@ -1,3 +1,5 @@
+let Selected_Matrix = [-1, -1];
+
 //穴の数が範囲外の時に警告を出すイベント
 document.getElementById('hole_num').addEventListener('blur', () => {
     let num = Number(document.getElementById('hole_num').value);
@@ -30,7 +32,7 @@ document.getElementById('btn_gen').addEventListener('click', () => {
 //生成ダイアログを閉じて数独の盤面を表示する
 function switchView(){
     document.getElementById('modal_generate').style.display = "none";
-    document.getElementById('sudoku_table_div').style.display = "block";
+    document.getElementById('sudoku_div').style.display = "flex";
 }
 
 //html上の数独のテーブルを生成
@@ -83,13 +85,15 @@ async function getData(hole_num){
                 let sudoku_table_cell = sudoku_table_cells[j];
                 if(json[i][j] != 0) sudoku_table_cell.innerText = json[i][j];
                 else sudoku_table_cell.innerText = '';
-                //0（穴の箇所）は非表示にする
-                if(JSON.parse(json[i][j] == 0)){
-                    sudoku_table_cell.style.opacity = '0';
-                }
                 //数字がある箇所は太字にする
-                else{
+                if(JSON.parse(json[i][j] != 0)){
                     sudoku_table_cell.style.fontWeight = 'bold';
+                }
+                //数値がない箇所はクラスを追加する
+                else{
+                    const baseClass = sudoku_table_cell.className;
+                    const addClass = 'cell_hole';
+                    sudoku_table_cell.className = baseClass + ' ' + addClass;
                 }
             }
         }
@@ -120,25 +124,30 @@ for(let i = 0; i < sudoku_matrix.length; i++){
                     let target_cell_var = sudoku_matrix[k][j];
                     let target_cell_box = sudoku_matrix[Math.floor(i % 9 / 3) * 3 + Math.floor(k / 3)][Math.floor(j % 9 / 3) * 3 + k % 3];
                     target_cell_hor.style.backgroundColor = 'rgb(200, 229, 248)';
-                    target_cell_hor.style.opacity = '1';
                     target_cell_var.style.backgroundColor = 'rgb(200, 229, 248)';
-                    target_cell_var.style.opacity = '1';
                     target_cell_box.style.backgroundColor = 'rgb(200, 229, 248)';
-                    target_cell_box.style.opacity = '1';
                 }
                 //同じ数値の箇所を選択状態にする
-                
+                for(let k = 0; k < sudoku_matrix.length; k++){
+                    for(let l = 0; l < sudoku_matrix[k].length; l++){
+                        if(sudoku_table_cell.innerText == sudoku_matrix[k][l].innerText){
+                            sudoku_matrix[k][l].style.backgroundColor = 'rgb(162, 218, 255)';
+                        }
+                    }
+                }
             }
-
-            sudoku_table_cell.style.opacity = '1';
+            //選択した箇所の色の変更
             sudoku_table_cell.style.backgroundColor = 'rgb(107, 188, 241)';
+            //太字でない箇所であれば行列を記憶
+            if(sudoku_table_cell.classList.contains('cell_hole')) Selected_Matrix = [i, j];
+            //太字の箇所であれば行列を初期化
+            else Selected_Matrix = [-1, -1];
         });
     }
 };
 
 //指定したセルの選択状態を削除する
 function deleteTargetCellStyle(cell){
-    if(cell.innerText == '') cell.style.opacity = '0';
     cell.style.backgroundColor = 'white';
 }
 //全てのセルの選択状態を削除する
@@ -148,4 +157,17 @@ function deleteTargetCellStyleAll(){
         let sudoku_table_cell = sudoku_table_cells[i];
         deleteTargetCellStyle(sudoku_table_cell);
     }
+}
+
+//数字のボタンをクリックしたときのイベント
+let btns_num = Array.from(document.getElementsByClassName('btn_num'));
+for(let i = 0; i < btns_num.length; i++){
+    btns_num[i].addEventListener('click', () =>{
+        //選択状態であるとき
+        if(Selected_Matrix[0] != -1 && Selected_Matrix[1] != -1){
+            let target_cell = sudoku_matrix[Selected_Matrix[0]][Selected_Matrix[1]];
+            target_cell.innerText = i + 1;
+            target_cell.click();
+        }
+    });
 }
