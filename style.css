@@ -38,9 +38,15 @@
     width: 60px;
     height: 60px;
     font-size: 25px;
+    margin: 5px;
+}
+#btn_delete{
+    margin: 20px 30px;
+    padding: 10px 30px;
+}
+.btn_num, #btn_delete{
     background-color: rgb(117, 204, 238);
     border-color: rgb(65, 172, 221);
-    margin: 5px;
 }
 
 .modal{

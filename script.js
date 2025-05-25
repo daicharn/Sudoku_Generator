@@ -9,7 +9,7 @@ document.getElementById('hole_num').addEventListener('blur', () => {
     }
 });
 
-//生成するボタンを推したとき
+//生成するボタンを押したとき
 document.getElementById('btn_gen').addEventListener('click', () => {
     let radio_gen_method = document.getElementsByName('gen_method');
     let hole_num = 0;
@@ -73,7 +73,7 @@ async function getData(hole_num){
             body: postData
         });
         if(!response.ok){
-            throw new Error('レスポンスステータス: ${response.status}');
+            throw new Error(`レスポンスステータス: ${response.status}`);
         }
 
         const json = await response.json();
@@ -143,8 +143,29 @@ for(let i = 0; i < sudoku_matrix.length; i++){
             //太字の箇所であれば行列を初期化
             else Selected_Matrix = [-1, -1];
         });
+        //ダブルクリックされた時のイベント
+        sudoku_table_cell.addEventListener('dblclick', () =>{
+            deleteCellNum();
+        });
     }
 };
+
+//削除ボタンを押したとき
+document.getElementById('btn_delete').addEventListener('click', () => {
+    deleteCellNum();
+});
+
+//セルの数値を削除する
+function deleteCellNum(){
+    if(Selected_Matrix[0] != -1 && Selected_Matrix[1] != -1){
+        let target_cell = sudoku_matrix[Selected_Matrix[0]][Selected_Matrix[1]];
+        if(target_cell.classList.contains('cell_hole')){
+            target_cell.innerText = '';
+            deleteTargetCellStyleAll();
+            target_cell.style.backgroundColor = 'rgb(107, 188, 241)';
+        }
+    }
+}
 
 //指定したセルの選択状態を削除する
 function deleteTargetCellStyle(cell){
