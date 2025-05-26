@@ -1,4 +1,5 @@
 <?php
+session_start();
 define("BOARD_SIZE", 9);
 
 //数字が盤面の添え字に該当するか調べる（0から8であるかどうか）
@@ -261,6 +262,7 @@ function generateSudokuBoardProb($sudoku_board_ans, int $empty_num){
 function generateSudoku(int $empty_num){
     //解答用の盤面の定義
     $sudoku_board_ans = generateSudokuBoardAns();
+    $_SESSION['sudoku_board_ans'] = $sudoku_board_ans;
     //問題用の盤面の定義
     $sudoku_board_prob = generateSudokuBoardProb($sudoku_board_ans, $empty_num);
     //Javascript側にデータを送信
@@ -268,4 +270,7 @@ function generateSudoku(int $empty_num){
     echo json_encode($sudoku_board_prob);
 }
 
-generateSudoku($_POST['hole_num']);
+$hole_num = $_POST['hole_num'];
+if($hole_num >= 0 && $hole_num <= 50){
+    generateSudoku($_POST['hole_num']);
+}

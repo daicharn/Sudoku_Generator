@@ -25,7 +25,7 @@ document.getElementById('btn_gen').addEventListener('click', () => {
         hole_num = Number(document.getElementById('hole_num').value);
     }
 
-    getData(hole_num);
+    getSudokuData(hole_num);
     switchView();
 });
 
@@ -63,7 +63,7 @@ function generateSudokuTableHTML(){
 }
 
 //PHPから数独のデータを取得する
-async function getData(hole_num){
+async function getSudokuData(hole_num){
     const url = 'gensudokuprob.php';
     try{
         const postData = new FormData();
@@ -180,6 +180,40 @@ function deleteTargetCellStyleAll(){
     }
 }
 
+//完成した数独のデータの答え合わせをする
+async function checkSudokuAns(){
+    const url = 'checksudokuans.php';
+    try{
+        const postData = new FormData();
+        let sudoku_num_matrix = [];
+        sudoku_matrix.forEach((sudoku_row) =>{
+            let sudoku_row_matrix = [];
+            sudoku_row.forEach((sudoku_cell) =>{
+                sudoku_row_matrix.push(Number(sudoku_cell.innerText));
+            });
+            sudoku_num_matrix.push(sudoku_row_matrix);
+        });
+
+        sudoku_num_matrix.forEach((sudoku_row_matrix) =>{
+            postData.append('sudoku_matrix[]', sudoku_row_matrix);
+        });
+        const response = await fetch(url, {
+            method: "POST",
+            body: postData
+        });
+        if(!response.ok){
+            throw new Error(`レスポンスステータス: ${response.status}`);
+        }
+
+        const json = await response.json();
+
+        console.log(json);
+
+    } catch (error){
+        console.log(error);
+    }
+}
+
 //数字のボタンをクリックしたときのイベント
 let btns_num = Array.from(document.getElementsByClassName('btn_num'));
 for(let i = 0; i < btns_num.length; i++){
@@ -189,6 +223,16 @@ for(let i = 0; i < btns_num.length; i++){
             let target_cell = sudoku_matrix[Selected_Matrix[0]][Selected_Matrix[1]];
             target_cell.innerText = i + 1;
             target_cell.click();
+
+            //全ての数値が埋まっている場合
+            let success_flg = true;
+            sudoku_matrix.forEach((sudoku_row) =>{
+                sudoku_row.forEach((sudoku_cell) =>{
+                    if(sudoku_cell.innerText == '') success_flg = false;
+                });
+                    
+            });
+            if(success_flg) checkSudokuAns();
         }
     });
 }

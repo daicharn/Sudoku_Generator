@@ -39,14 +39,23 @@
     height: 60px;
     font-size: 25px;
     margin: 5px;
+    border-radius: 5%;
 }
 #btn_delete{
     margin: 20px 30px;
     padding: 10px 30px;
+    border-radius: 5%;
 }
 .btn_num, #btn_delete{
     background-color: rgb(117, 204, 238);
     border-color: rgb(65, 172, 221);
+    transition: 0.5s;
+    cursor: pointer;
+}
+.btn_num:hover, #btn_delete:hover{
+    background-color: rgb(91, 198, 240);
+    border-color: rgb(35, 161, 219);
+    transition: 0.5s;
 }
 
 .modal{
