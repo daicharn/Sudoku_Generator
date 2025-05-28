@@ -1,6 +1,10 @@
 <?php
 session_start();
 define("BOARD_SIZE", 9);
+define("HINT_NUM", 3);
+//ヒントの使用可能回数を決定
+$_SESSION['hint_num_max'] = HINT_NUM;
+$_SESSION['hint_num'] = HINT_NUM;
 
 //数字が盤面の添え字に該当するか調べる（0から8であるかどうか）
 function isBoardIndex(int $num_index){

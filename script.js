@@ -10,7 +10,7 @@ document.getElementById('hole_num').addEventListener('blur', () => {
 });
 
 //生成するボタンを押したとき
-document.getElementById('btn_gen').addEventListener('click', () => {
+document.getElementById('btn_gen').addEventListener('click', async() => {
     let radio_gen_method = document.getElementsByName('gen_method');
     let hole_num = 0;
     //難易度で指定が選択されている場合
@@ -27,6 +27,9 @@ document.getElementById('btn_gen').addEventListener('click', () => {
 
     getSudokuData(hole_num);
     switchView();
+    let hint_matrix = await getHintCount();
+    document.getElementById('hint_num_max').innerText = hint_matrix[0];
+    document.getElementById('hint_num').innerText = hint_matrix[1];
 });
 
 //生成ダイアログを閉じて数独の盤面を表示する
@@ -97,6 +100,27 @@ async function getSudokuData(hole_num){
                 }
             }
         }
+
+    } catch (error){
+        console.log(error);
+    }
+}
+
+//PHPからヒントの回数を取得する
+async function getHintCount(){
+    const url = 'gethintcount.php';
+    try{
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "same-origin"
+        });
+        if(!response.ok){
+            throw new Error(`レスポンスステータス: ${response.status}`);
+        }
+
+        const json = await response.json();
+
+        return json;
 
     } catch (error){
         console.log(error);
@@ -301,5 +325,10 @@ async function getHintNum(){
 //ヒントボタンをクリックしたときのイベント
 document.getElementById('btn_hint').addEventListener('click', async() => {
     let answer_num = await getHintNum();
-    if(answer_num != -1) btns_num[answer_num - 1].click();
+    if(answer_num != -1){
+        btns_num[answer_num - 1].click();
+        let hint_matrix = await getHintCount();
+        document.getElementById('hint_num').innerText = hint_matrix[1];
+        if(hint_matrix[1] == 0) document.getElementById('hint_num').style.color = 'red';
+    }
 });
