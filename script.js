@@ -236,6 +236,11 @@ for(let i = 0; i < btns_num.length; i++){
             if(success_flg && await checkSudokuAns()){
                 //数独のテーブルにアニメーションを加える
                 animateSudokuDiagonal();
+                //cell_holeクラスを削除する
+                Array.from(document.getElementsByClassName('cell_hole')).forEach((cell_hole) =>{
+                    cell_hole.classList.remove('cell_hole');
+                });
+                Selected_Matrix = [-1, -1];
             }
         }
     });
@@ -264,3 +269,37 @@ function animateSudokuDiagonal() {
         }, delayBase * sum);
     }
 }
+
+//選択したセルのヒント（答え）を得る
+async function getHintNum(){
+    if(Selected_Matrix[0] != -1 && Selected_Matrix[1] != -1){
+        const url = 'gethintnum.php';
+        try{
+            const postData = new FormData();
+            postData.set('selected_matrix', Selected_Matrix);
+            const response = await fetch(url, {
+                method: "POST",
+                body: postData
+            });
+            if(!response.ok){
+                throw new Error(`レスポンスステータス: ${response.status}`);
+            }
+
+            const json = await response.json();
+
+            return json;
+
+        } catch (error){
+            console.log(error);
+        }
+    }
+    else{
+        return -1;
+    }
+}
+
+//ヒントボタンをクリックしたときのイベント
+document.getElementById('btn_hint').addEventListener('click', async() => {
+    let answer_num = await getHintNum();
+    if(answer_num != -1) btns_num[answer_num - 1].click();
+});

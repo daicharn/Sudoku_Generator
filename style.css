@@ -27,10 +27,14 @@
     border-color:rgb(26, 182, 255);
 }
 
+#btn_div{
+    width: 250px;
+    height: 300px;
+}
 #btn_num_div{
     display: flex;
     flex-wrap: wrap;
-    margin-left: 20px;
+    margin: 0 auto;
     width: 210px;
     height: 210px;
 }
@@ -41,18 +45,23 @@
     margin: 5px;
     border-radius: 5%;
 }
-#btn_delete{
-    margin: 20px 30px;
-    padding: 10px 30px;
-    border-radius: 5%;
+#btn_list_div{
+    display: flex;
 }
-.btn_num, #btn_delete{
+#btn_delete, #btn_hint{
+    width: 100px;
+    height: 50px;
+    border-radius: 5%;
+    margin: 20px auto;
+}
+.btn_num, #btn_delete, #btn_hint{
     background-color: rgb(117, 204, 238);
     border-color: rgb(65, 172, 221);
+    color: rgb(56, 56, 56);
     transition: 0.5s;
     cursor: pointer;
 }
-.btn_num:hover, #btn_delete:hover{
+.btn_num:hover, #btn_delete:hover, #btn_hint:hover{
     background-color: rgb(91, 198, 240);
     border-color: rgb(35, 161, 219);
     transition: 0.5s;
