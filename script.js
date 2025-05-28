@@ -207,7 +207,7 @@ async function checkSudokuAns(){
 
         const json = await response.json();
 
-        console.log(json);
+        return json;
 
     } catch (error){
         console.log(error);
@@ -217,7 +217,7 @@ async function checkSudokuAns(){
 //数字のボタンをクリックしたときのイベント
 let btns_num = Array.from(document.getElementsByClassName('btn_num'));
 for(let i = 0; i < btns_num.length; i++){
-    btns_num[i].addEventListener('click', () =>{
+    btns_num[i].addEventListener('click', async() =>{
         //選択状態であるとき
         if(Selected_Matrix[0] != -1 && Selected_Matrix[1] != -1){
             let target_cell = sudoku_matrix[Selected_Matrix[0]][Selected_Matrix[1]];
@@ -232,7 +232,35 @@ for(let i = 0; i < btns_num.length; i++){
                 });
                     
             });
-            if(success_flg) checkSudokuAns();
+
+            if(success_flg && await checkSudokuAns()){
+                //数独のテーブルにアニメーションを加える
+                animateSudokuDiagonal();
+            }
         }
     });
+}
+
+//斜めにセルの背景色を描画していくアニメーション
+function animateSudokuDiagonal() {
+    const delayBase = 100; // 各斜めラインに対する遅延
+    for (let sum = 0; sum <= 16; sum++) {
+        setTimeout(() => {
+            for (let i = 0; i <= sum; i++) {
+                const j = sum - i;
+                if (i < 9 && j < 9) {
+                    const cell = sudoku_matrix[i][j];
+                    cell.animate(
+                        {
+                            backgroundColor: ['white', 'rgba(111, 238, 238, 0.71)']
+                        },
+                        {
+                            duration: 300,
+                            fill: 'forwards'
+                        }
+                    );
+                }
+            }
+        }, delayBase * sum);
+    }
 }
