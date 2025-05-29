@@ -27,9 +27,6 @@ document.getElementById('btn_gen').addEventListener('click', async() => {
 
     getSudokuData(hole_num);
     switchView();
-    let hint_matrix = await getHintCount();
-    document.getElementById('hint_num_max').innerText = hint_matrix[0];
-    document.getElementById('hint_num').innerText = hint_matrix[1];
 });
 
 //生成ダイアログを閉じて数独の盤面を表示する
@@ -80,16 +77,15 @@ async function getSudokuData(hole_num){
         }
 
         const json = await response.json();
-
         let sudoku_table_rows = document.getElementsByClassName('sudoku_table_row');
         for(let i = 0; i < 9; i++){
             let sudoku_table_cells = sudoku_table_rows[i].children;
             for(let j = 0; j < 9; j++){
                 let sudoku_table_cell = sudoku_table_cells[j];
-                if(json[i][j] != 0) sudoku_table_cell.innerText = json[i][j];
+                if(json['sudoku'][i][j] != 0) sudoku_table_cell.innerText = json['sudoku'][i][j];
                 else sudoku_table_cell.innerText = '';
                 //数字がある箇所は太字にする
-                if(JSON.parse(json[i][j] != 0)){
+                if(JSON.parse(json['sudoku'][i][j] != 0)){
                     sudoku_table_cell.style.fontWeight = 'bold';
                 }
                 //数値がない箇所はクラスを追加する
@@ -100,6 +96,9 @@ async function getSudokuData(hole_num){
                 }
             }
         }
+
+        document.getElementById('hint_num_max').innerText = json['hint_num_max'];
+        document.getElementById('hint_num').innerText = json['hint_num'];
 
     } catch (error){
         console.log(error);
@@ -329,6 +328,12 @@ document.getElementById('btn_hint').addEventListener('click', async() => {
         btns_num[answer_num - 1].click();
         let hint_matrix = await getHintCount();
         document.getElementById('hint_num').innerText = hint_matrix[1];
-        if(hint_matrix[1] == 0) document.getElementById('hint_num').style.color = 'red';
+        if(hint_matrix[1] == 0){
+            document.getElementById('hint_num').style.color = 'red';
+            let btn_hint = document.getElementById('btn_hint');
+            btn_hint.disabled = true;
+            btn_hint.style.backgroundColor = 'rgb(175, 175, 175)';
+            btn_hint.style.border = '2px solid rgb(110, 110, 110)';
+        }
     }
 });

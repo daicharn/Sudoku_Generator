@@ -1,5 +1,6 @@
 <?php
 session_start();
+session_unset();
 define("BOARD_SIZE", 9);
 define("HINT_NUM", 3);
 //ヒントの使用可能回数を決定
@@ -271,7 +272,9 @@ function generateSudoku(int $empty_num){
     $sudoku_board_prob = generateSudokuBoardProb($sudoku_board_ans, $empty_num);
     //Javascript側にデータを送信
     header("Content-Type: text/javascript; charset=utf-8");
-    echo json_encode($sudoku_board_prob);
+    echo json_encode(['sudoku' => $sudoku_board_prob,
+                      'hint_num_max' => $_SESSION['hint_num_max'],
+                      'hint_num' => $_SESSION['hint_num']]);
 }
 
 $hole_num = $_POST['hole_num'];
