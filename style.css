@@ -1,11 +1,20 @@
 #sudoku_div{
     display: none;
     justify-content: center;
+    border: 1px solid rgb(141, 141, 141);
+    width: 750px;
+    height: 400px;
+    margin: 20px auto;
+    border-radius: .50rem;
+    box-shadow: 6px 6px 10px 0px rgba(0, 0, 0, 0.4);
 }
 #sudoku_table{
     margin: 0 auto;
     border-collapse: collapse;
     border: solid 3px;
+}
+#sudoku_table_div{
+    margin: auto 0;
 }
 .sudoku_table_cell{
     border: solid 1px;
@@ -30,6 +39,7 @@
 #btn_div{
     width: 250px;
     height: 350px;
+    margin: auto 10px;
 }
 #btn_num_div{
     display: flex;
